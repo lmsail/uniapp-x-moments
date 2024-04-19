@@ -1,0 +1,105 @@
+<template>
+	<view>
+		<image class="upload" src="/static/camera.png" mode="scaleToFill" @click="toApply"></image>
+		<!-- 自定义沉浸式导航栏 -->
+		<view class="navbar" ref="navbar">
+			<!-- 状态栏高度 -->
+			<view :style="safeTopStyle">&nbsp;</view>
+			<!-- navbar 部分 -->
+			<view class="titlebar">
+				<text class="title">朋友圈</text>
+				<image class="camera" src="/static/camera-black.png" mode="scaleToFill" @click="toApply"></image>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			windowInfo: {
+				type: Object,
+				default: {}
+			},
+			scrollTop: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {
+				topSafeHeight: 0
+			}
+		},
+		computed: {
+			safeTopStyle() : string {
+				return `height: ${this.topSafeHeight}`;
+			},
+		},
+		mounted() {
+			this.topSafeHeight = uni.getWindowInfo().safeAreaInsets.top;
+		},
+		watch: {
+			scrollTop(value: number) {
+				const element = this.$refs['navbar'] as UniElement;
+				if (value > 100) {
+					element.style.setProperty("opacity", '1');
+				} else { 
+					element.style.setProperty("opacity", '0');
+				}
+			}
+		},
+		methods: {
+			toApply() {
+				console.log('123')
+				uni.navigateTo({ url: '/pages/index/apply' });
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 999;
+	opacity: 0;
+	background-color: rgba(255, 255, 255, 1);
+	transition-property: opacity;
+	transition-duration: 300ms;
+	box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.1);
+	
+	.titlebar {
+		height: 45px;
+		position: relative;
+		
+		.title {
+			line-height: 45px;
+			font-size: 18px;
+			color: #000;
+			flex: 1;
+			font-weight: bold;
+			text-align: center;
+		}
+		
+		.camera {
+			position: absolute;
+			right: 15px;
+			top: 13px;
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+.upload {
+	position: fixed;
+	top: 55px;
+	z-index: 999;
+	right: 15px;
+	width: 20px;
+	height: 20px;
+}
+</style>

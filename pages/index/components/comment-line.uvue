@@ -1,0 +1,46 @@
+<template>
+	<view class="line uni-row uni-between mt-5">
+		<!-- 时间 -->
+		<text class="time">3分钟前</text>
+		<!-- 点赞/评论按钮 -->
+		<view class="icon uni-row uni-center" ref="commentIcon" @click="showComment">
+			<text class="dot mr-5"></text>
+			<text class="dot"></text>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	const commentIcon = ref(null)
+	 
+	const showComment = () => {
+		const ret = (commentIcon.value as UniElement).getBoundingClientRect();
+		uni.$emit('showCommentPopup', ret.top - 8);
+	}
+</script>
+
+<style scoped lang="scss">
+	.line {
+		position: relative;
+		z-index: 999;
+	}
+	
+	.time {
+		color: #999;
+		font-size: 14px;
+	}
+	
+	.icon {
+		background-color: #eee;
+		border-radius: 3px;
+		width: 35px;
+		height: 20px;
+		
+		.dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 6px;
+			background-color: #999;
+		}
+	}
+</style>

@@ -1,0 +1,84 @@
+<template>
+	<view class="tool uni-row uni-center" ref="commentElement">
+		<view class="zan uni-row uni-center" @click="dianzan">
+			<uni-icons type="heart" color="#fff"></uni-icons>
+			<text class="color-white font-14">赞</text>
+		</view>
+		<view class="comment uni-row uni-center" @click="pinglun">
+			<uni-icons type="chat" color="#fff"></uni-icons>
+			<text class="color-white font-14">评论</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		name: 'commentPopup',
+		
+		data() {
+			return {
+				commentToolStatus: false,
+			}
+		},
+		mounted() {
+			// 监听显示点赞/评论浮窗
+			uni.$on('showCommentPopup', this.showCommentPopup);
+		},
+		methods: {
+			dianzan() {
+				this.hideCommentPopup();
+				uni.showToast({ title: "点赞", icon: "none" })
+			},
+			
+			pinglun(e : PointerEvent) {
+				this.hideCommentPopup();
+				uni.$emit('commentScrollEvent', e.y);
+				uni.showToast({ title: "评论", icon: "none" })
+			},
+			
+			showCommentPopup(y : number) {
+			    if (!this.commentToolStatus) {
+					const element = this.$refs["commentElement"] as UniViewElement;
+			        element.style.setProperty("top", `${y}px`);
+					element.style.setProperty("width", "160px");
+					element.style.setProperty("opacity", 1);
+					this.commentToolStatus = true;
+			    } else {
+					this.hideCommentPopup();
+				}
+			},
+			
+			hideCommentPopup() {
+				if (!this.commentToolStatus) return;
+			    const element = this.$refs["commentElement"] as UniViewElement;
+				element.style.setProperty("width", "0px");
+				element.style.setProperty("opacity", 0);
+				this.commentToolStatus = false;
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.tool {
+		position: absolute;
+		right: 60px;
+		z-index: 999;
+		
+		width: 0;
+		height: 35px;
+		background-color: #666;
+		border-radius: 3px;
+		opacity: 0;
+		transition-property: width, opacity;
+		transition-duration: 100ms;
+		
+		.comment, .zan {
+			width: 80px;
+		}
+		
+		.zan {
+			border-right: 0.5px solid #555;
+		}
+	}
+</style>

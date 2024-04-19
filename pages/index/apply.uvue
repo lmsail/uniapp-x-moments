@@ -1,0 +1,130 @@
+<template>
+	<view>
+		<!-- 自定义header -->
+		<uni-navbar-lite title="发表文字">
+			<template #right>
+				<view class="button uni-row uni-center uni-column" @click="apply" :class="{disabled: disabled}" hover-class="button-hover">
+					<text class="text color-white font-14 font-bold">发表</text>
+				</view>
+			</template>
+		</uni-navbar-lite>
+
+		<!-- 发表文字 -->
+		<view class="content">
+			<textarea class="uni-textarea font-16" cursor-color="#29ad68" :auto-focus="false" :auto-height="true"
+				:adjust-position="false" :maxlength="100"></textarea>
+
+			<!-- 图片上传 -->
+			<uni-drag-image ref="dragImage" :imageList="imageList" @chooseImage="chooseImageEvent"></uni-drag-image>
+
+			<!-- 菜单 -->
+			<uni-list>
+				<uni-item title="所在位置" icon="location" :value="address" @click="setAddress"></uni-item>
+				<uni-item title="提醒谁看" icon="eye"></uni-item>
+				<uni-item title="谁可以看" icon="staff" value="公开"></uni-item>
+			</uni-list>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { LocationType } from '@/type/typeData.uts';
+	import UniList from '@/components/uni-list/uni-list.uvue';
+	import UniItem from '@/components/uni-list/uni-item.uvue';
+	import uniDragImage from '../../components/uni-drag-image/uni-drag-image.uvue';
+	export default {
+		components: {
+			UniList,
+			UniItem,
+			uniDragImage
+		},
+		data() {
+			return {
+				disabled: true,
+				imageList: [
+					"http://iph.href.lu/200x200?text=1&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=2&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=3&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=4&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=5&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=6&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=7&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=8&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=9&fg=666666&bg=cccccc",
+				] as string[],
+
+				address: '', // 当前位置信息
+			};
+		},
+		methods: {
+			setAddress() {
+				if (this.address != "") return;
+
+				uni.showLoading({
+					title: '正在获取位置...'
+				});
+				uni.getLocation(({
+					type: 'wgs84',
+					altitude: true,
+					geocode: true,
+					success: (res: any) => {
+						this.address = (res as LocationType).address;
+					},
+					fail: (res: any) => {
+						console.log('定位失败：', res);
+						this.address = '定位失败';
+					},
+					complete: () => {
+						uni.hideLoading();
+					}
+				}));
+			},
+
+			// 发表朋友圈
+			apply() {
+
+			},
+
+			// 选择图片
+			chooseImageEvent() {
+				uni.chooseImage({
+					count: 9,
+					sizeType: ['original', 'compressed'],
+					sourceType: ['album', 'camera'],
+					success: res => {
+						this.imageList = [...this.imageList, ...res.tempFilePaths];
+					},
+				})
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.button {
+		height: 30px;
+		width: 50px;
+		border-radius: 3px;
+		background: #29ad68;
+	}
+
+	.disabled {
+		background: #ddd !important;
+
+		.text {
+			color: #999;
+		}
+	}
+
+	.content {
+		padding: 15px 30px;
+	}
+
+	.uni-textarea {
+		min-height: 150px;
+	}
+
+	.button-hover {
+		background-color: #dedede;
+	}
+</style>

@@ -1,0 +1,82 @@
+<script lang="uts">
+	export default {
+		onLaunch: function () {
+			console.log('App Launch')
+		},
+		onShow: function () {
+			console.log('App Show')
+		},
+		onHide: function () {
+			console.log('App Hide')
+		},
+	}
+</script>
+
+<style>
+	/*每个页面公共css */
+	.uni-row {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.uni-column {
+		flex-direction: column;
+	}
+	
+	.uni-row-wrap {
+		flex-wrap: wrap;
+	}
+	
+	.uni-items-center {
+		align-items: center;
+	}
+	
+	.uni-justify-center {
+		justify-content: center;
+	}
+	
+	.uni-center {
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.uni-between {
+		justify-content: space-between;
+	}
+	
+	.mr-5 {
+		margin-right: 5px;
+	}
+	
+	.mr-10 {
+		margin-right: 10px;
+	}
+	
+	.mt-5 {
+		margin-top: 5px;
+	}
+	
+	.ml-5 {
+		margin-left: 5px;
+	}
+	
+	.mb-5 {
+		margin-bottom: 5px;
+	}
+	
+	.font-bold {
+		font-weight: bold;
+	}
+	
+	.font-14 {
+		font-size: 14px;
+	}
+	
+	.font-16 {
+		font-size: 16px;
+	}
+	
+	.color-white {
+		color: white;
+	}
+</style>

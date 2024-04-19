@@ -1,0 +1,88 @@
+<template>
+	<view class="zancomment mt-5 uni-row uni-column">
+		<!-- 点赞列表 -->
+		<view class="zanlist uni-row uni-items-center uni-row-wrap">
+			<uni-icons class="mr-5" style="padding-top: 2px;" type="heart" size="14" color="#596D95"></uni-icons>
+			<text class="username font-16">张三,</text>
+			<text class="username font-16">查理斯,</text>
+			<text class="username font-16">王二麻,</text>
+			<text class="username font-16">切尔西,</text>
+			<text class="username font-16">张三,</text>
+			<text class="username font-16">查理斯,</text>
+			<text class="username font-16">王二麻,</text>
+			<text class="username font-16">切尔西,</text>
+			<text class="username font-16">张三,</text>
+			<text class="username font-16">查理斯,</text>
+			<text class="username font-16">王二麻,</text>
+			<text class="username font-16">切尔西</text>
+		</view>
+		
+		<!-- 评论列表 -->
+		<view class="comment-list">
+			<view class="comment-item uni-row uni-items-center uni-row-wrap" :id="listId" hover-class="comment-hover" :hover-stay-time="100" @click="toComment">
+				<text class="username font-16">查理斯：</text>
+				<text class="font-16">这是什么地方？真好看啊</text>
+			</view>
+			<view class="comment-item uni-row uni-row-wrap" hover-class="comment-hover" :hover-stay-time="100" @click="toComment">
+				<text class="username font-16">张三</text>
+				<text class="font-16">回复</text>
+				<text class="username font-16">查理斯：</text>
+				<comment-text text="从视频上看，我感觉应该是网上随便截的图，包括文案！"></comment-text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import CommentText from './comment-text.uvue';
+	export default {
+		components: {
+			CommentText
+		},
+		props: {
+			listId: {
+				type: String,
+				default: ""
+			}
+		},
+		data() {
+			return {
+				
+			}
+		},
+		methods: {
+			toComment(e : PointerEvent) {
+				uni.$emit('commentScrollEvent', e!.y);
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+// 点赞/评论列表
+.zancomment {
+	background-color: #F7F6F7;
+	border-radius: 5px;
+	
+	.username {
+		color: #596D95;
+		font-weight: 700;
+	}
+	
+	.zanlist {
+		padding: 5px 10px;
+	}
+	
+	.comment-list {
+		border-top: 0.5px solid #eee;
+		
+		.comment-item {
+			padding: 5px 10px;
+		}
+	}
+}
+	
+.comment-hover { 
+	background-color: #ddd;
+}
+</style>

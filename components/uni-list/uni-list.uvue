@@ -1,0 +1,24 @@
+<template>
+	<view class="uni-list">
+		<slot></slot>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				
+			}
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.uni-list {
+		
+	}
+</style>

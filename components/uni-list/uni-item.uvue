@@ -1,0 +1,72 @@
+<template>
+	<view class="uni-item uni-row uni-items-center uni-between" @click="clickEvent">
+		<view class="uni-row uni-items-center">
+			<uni-icons :type="icon" size="18" color="#000"></uni-icons>
+			<text class="title font-16">{{ title }}</text>
+		</view>
+		<text class="value font-16" v-if="value != ''">{{ value }}</text>
+		<uni-icons type="right" size="16" color="#999"></uni-icons>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			title: {
+				type: String,
+				default: ''
+			},
+			value: {
+				type: String,
+				default: ''
+			},
+			to: {
+				type: String,
+				default: ''
+			},
+			icon: {
+				type: String,
+				default: ''
+			}
+		},
+		watch: {
+			value() {
+				this.loading = this.value == '';
+			}
+		},
+		data() {
+			return {
+				loading: false as boolean
+			}
+		},
+		methods: {
+			clickEvent() {
+				if (this.to !== '') {
+					this.openPage();
+					return;
+				}
+				this.$emit('click', {});
+			},
+			
+			openPage() {
+				uni.navigateTo({ url: this.to });
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.uni-item {
+		padding: 15px 0;
+		border-bottom: 0.5px solid #eee;
+		.title {
+			margin-left: 10px;
+		}
+		.value {
+			flex: 1;
+			color: #666;
+			text-align: right;
+			margin-right: 10px;
+		}
+	}
+</style>

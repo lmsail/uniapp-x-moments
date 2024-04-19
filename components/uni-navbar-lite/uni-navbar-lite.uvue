@@ -1,0 +1,109 @@
+<template>
+	<view class="uni-navbar">
+		<view class="uni-navbar-inner" :style="navbarStyle">
+			<view class="left-content" @click="back">
+				<uni-icons type="left" size="26" :color="textColor"></uni-icons>
+			</view>
+			<view class="uni-navbar-content" :class="{ 'is-left': isLeft }">
+				<text class="uni-bar-title" :style="{ color: textColor }">
+					<slot>{{ title }}</slot>
+				</text>
+			</view>
+			<view class="right-content">
+				<slot name="right"></slot>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		name: "uni-navbar",
+		props: {
+			title: {
+				type: String,
+				default: "",
+			},
+			isLeft: {
+				type: Boolean,
+				default: false,
+			},
+			textColor: {
+				type: String,
+				default: "#000",
+			},
+		},
+		data() {
+			return {
+				statusBarHeight: 0,
+			};
+		},
+		computed: {
+			navbarStyle() : string {
+				return `margin-top:${this.statusBarHeight}px`;
+			},
+		},
+		created() {
+			const sys = uni.getSystemInfoSync();
+			const statusBarHeight = sys.statusBarHeight;
+			this.statusBarHeight = statusBarHeight;
+		},
+		mounted() {
+			uni.setNavigationBarColor({
+				frontColor: "#000000",
+				backgroundColor: "#ffffff",
+			});
+		},
+		methods: {
+			back() {
+				uni.navigateBack({});
+			},
+		},
+	};
+</script>
+
+<style>
+	.uni-navbar {
+		background-color: #fff;
+	}
+
+	.uni-navbar-inner {
+		position: relative;
+		flex-direction: row;
+		justify-content: space-between;
+		height: 45px;
+	}
+
+	.left-content,
+	.right-content {
+		justify-content: center;
+		align-items: center;
+		width: 40px;
+		height: 100%;
+	}
+	
+	.right-content {
+		width: 80px;
+	}
+
+	.uni-navbar-content {
+		position: absolute;
+		height: 100%;
+		top: 0;
+		bottom: 0;
+		left: 45px;
+		right: 45px;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+	
+	.uni-bar-title {
+		font-size: 18px;
+		font-weight: bold;
+	}
+
+	.is-left {
+		justify-content: flex-start;
+	}
+</style>

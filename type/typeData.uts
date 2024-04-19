@@ -1,0 +1,11 @@
+
+export type LocationType = {
+	altitude: number;
+	latitude: number;
+	longitude: number;
+	address: string;
+	speed: number;
+	horizontalAccuracy: number;
+	accuracy: number;
+	verticalAccuracy: number;
+}

@@ -1,0 +1,148 @@
+<template>
+	<list-view 
+		id="listview" style="flex: 1;background: #fff;" 
+		:refresher-enabled="false" 
+		:refresher-default-style="refresherStyle"
+		:refresher-triggered="refresherTriggered" 
+		@refresherrefresh="refresherrefresh" 
+		@scrolltolower="onScrollTolower"
+		@scroll="scrollEvent"
+		@touchstart="outsideTouchEvent"
+	>
+		<!-- 朋友圈背景图 --> 
+		<list-item class="top"> 
+			<image class="bg-image" src="/static/1.png" mode="aspectFill"></image>
+			<view class="user-info uni-row" ref="user-info">
+				<text class="username">微信朋友圈</text>
+				<image class="user-avatar" src="https://img0.baidu.com/it/u=1415523915,841919565&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=a9e21a0e5650a672fa2cbd3b133ed7e0" mode="widthFix"></image>
+			</view>
+		</list-item>
+	 
+		<!-- 视频朋友圈内容 -->
+		<list-item class="item uni-row">
+			<image class="avatar" src="/static/1.png" mode="scaleToFill"></image>
+			<view class="content uni-row uni-column">
+				<text class="name">UNIAPP X</text>
+				<text class="text">{{ text }}</text>
+				<!-- 图片 / 视频 -->
+				<view class="video">
+					<video :controls="false" class="video" poster="/static/1.png" src="https://qiniu-web-assets.dcloud.net.cn/video/sample/2minute-demo.mp4"></video>
+				</view>
+				<!-- 时间/点赞/评论按钮 -->
+				<comment-line></comment-line>
+				<!-- 点赞/评论信息列表 -->
+				<comment listId="comment-id"></comment> 
+			</view>
+		</list-item>
+	
+		<!-- 图文朋友圈内容 -->
+		<list-item class="item uni-row" v-for="index in item_count">
+			<image class="avatar" src="/static/1.png" mode="scaleToFill"></image>
+			<view class="content uni-row uni-column">
+				<text class="name">UNIAPP X {{ index }}</text>
+				<text class="text">{{ text }}</text>
+				<!-- 图片 / 视频 -->
+				<view class="images uni-row">
+					<image class="image" v-for="(image, index) in imageList" :src="image" mode="aspectFill" @click="previewImage(index)"></image>
+				</view>
+				<!-- 定位 -->
+				<text class="address mt-5">上海市 · 静安寺</text>
+				<!-- 时间/点赞/评论按钮 -->
+				<comment-line></comment-line>
+				<!-- 点赞/评论信息列表 -->
+				<comment></comment>
+			</view>
+		</list-item>
+	</list-view>
+	
+	<!-- 自定义导航栏 -->
+	<moments-header ref="header" :scrollTop="scrollTop"></moments-header>
+	
+	<!-- 点赞/评论 -->
+	<comment-popup ref="commentPopupRef"></comment-popup>
+	
+	<!-- 评论输入框 -->
+	<comment-input ref="commentInputRef"></comment-input>
+</template> 
+
+<script>
+	import MomentsHeader from './components/momentsHeader.uvue';
+	import CommentPopup from './components/comment-popup.uvue';
+	import CommentLine from './components/comment-line.uvue';
+	import CommentInput from './components/comment-input.uvue';
+	import Comment from './components/comment.uvue';
+	export default {
+		components: { CommentLine, Comment, MomentsHeader, CommentInput, CommentPopup },
+		data() {
+			return {
+				item_count: 20,
+				listViewElement: null as UniListViewElement | null,
+				refresherTriggered: false,
+				refresherStyle: "none",
+				text: `uni-app x，是下一代 uni-app，是一个跨平台应用开发引擎。uts是一门类ts的、跨平台的、新语言。uts在iOS端编译为swift、在Android端编译为kotlin、在Web端编译为js。`,
+				imageList: [
+					"https://img1.baidu.com/it/u=1965663592,580944689&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=5c73d7f8aaa2a6f5114e659dd64e769d",
+					"https://img0.baidu.com/it/u=3838093562,4126749835&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=a2cd3d4ac8c0f2024a348772577a9d0f",
+					"https://img0.baidu.com/it/u=256816879,771155532&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=d5230b0cfdae75de3c452d973d302106",
+					"https://img1.baidu.com/it/u=1965663592,580944689&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=5c73d7f8aaa2a6f5114e659dd64e769d",
+					"https://img0.baidu.com/it/u=3838093562,4126749835&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=a2cd3d4ac8c0f2024a348772577a9d0f",
+					"https://img0.baidu.com/it/u=256816879,771155532&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=d5230b0cfdae75de3c452d973d302106",
+				],
+				scrollTop: 0,
+				keyboardHeight: 368, // ios 默认键盘高度，这里占位
+			}
+		},
+		onReady() {
+			this.listViewElement = uni.getElementById<UniListViewElement>('listview');
+			// 监听点击评论事件
+			uni.$on('commentScrollEvent', (y: number) => this.listViewScrollByY(y - this.keyboardHeight + 40));
+			// 监听一次键盘高度回调
+			uni.$once('keyboardHeightEvent', (keyboardHeight: number) => {
+				this.keyboardHeight = keyboardHeight;
+			});
+		},
+		methods: {
+			
+			// 目标元素以外的touch事件
+			outsideTouchEvent() {
+				// https://doc.dcloud.net.cn/uni-app-x/component/#methods
+				(this.$refs['commentPopupRef'] as ComponentPublicInstance).$callMethod('hideCommentPopup'); // 隐藏点赞/评论
+				(this.$refs['commentInputRef'] as ComponentPublicInstance).$callMethod('hideKeyboard'); // 隐藏评论框与键盘
+			},
+			
+			previewImage(index : number) {
+				uni.previewImage({
+					urls: this.imageList,
+					current: index,
+					indicator: "default",
+					loop: false
+				})
+			},
+
+			refresherrefresh() {
+				console.log('下拉刷新被触发了')
+				setTimeout(() => {
+					this.refresherTriggered = false;
+				}, 1000)
+			},
+
+			onScrollTolower(_ : ScrollToLowerEvent) {
+				setTimeout(() => {
+					this.item_count += 20
+				}, 300)
+			},
+			
+			scrollEvent(e : UniScrollEvent) {
+				this.scrollTop = e.detail.scrollTop;
+			},
+
+			listViewScrollByY(y : number) {
+				this.listViewElement?.scrollBy(0, y)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import './index.scss';
+</style>

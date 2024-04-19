@@ -1,0 +1,216 @@
+<template>
+	<view>
+		<view class="addfile uni-row uni-row-wrap">
+			<view class="apply-image" v-for="(imageSrc, index) in imageList" v-if="imageList!!.length > 0" :style="move && currentIndex == index ? 'border: 1px dashed #eee;' : 'border: none'">
+				<image class="image" :id="`image_${index}`" mode="aspectFill" :src="imageSrc" @touchstart="(e: TouchEvent) => onTouchStart(e, index)" @touchmove="onTouchMove" @touchend="onTouchEnd"></image>
+			</view>
+			<view class="uni-addfile uni-row uni-center" @click="chooseImage" v-if="imageList!!.length < count">
+				<image class="plus" src="./plus.png" mode="scaleToFill"></image>
+			</view>
+		</view>
+		
+		<!-- 删除区域 -->
+		<view class="delete-area uni-row uni-column uni-center" ref="deleteArea" :class="{show: move, opacity: isInDeleteArea}" :style="safeBottomStyle">
+			<uni-icons type="trash" size="26" color="#fff"></uni-icons>
+			<text class="font-14 color-white">{{ isInDeleteArea ? '松手即可删除' : '删除' }}</text>
+		</view>
+	</view>
+</template> 
+ 
+<script> 
+	/**
+	 * 图片9宫格拖拽删除
+	 * 注意：页面暂不支持滚动，滚动可能导致布局错乱
+	 */
+	export default {
+		props: {
+			imageList: {
+				type: Array as PropType<Array<string>>
+			},
+			count: {
+				type: Number,
+				default: 9
+			}
+		},
+		data() {
+			return {
+				currentElement: null as UniElement | null,
+				currentIndex: 0,
+				move: false,
+				lastX: 0,
+				lastY: 0, 
+				
+				// 图片起始y轴高度
+				startY: 0,
+				
+				// 记录当前拖拽节点的原始位置
+				nodePosition: [] as number[],
+				bottomSafeHeight: 0,
+				
+				// 删除区域
+				deleteAreaElement: null as UniElement | null,
+				deleteAreaY: 0,
+				deleteTimer: -1,
+				isInDeleteArea: false,
+			}
+		},
+		computed: {
+			safeBottomStyle() : string {
+				return `height: 100px;padding-bottom: ${this.bottomSafeHeight}px`;
+			},
+		},
+		mounted() {
+			const sys = uni.getSystemInfoSync();
+			this.bottomSafeHeight = sys.safeAreaInsets.bottom;
+			this.deleteAreaElement = this.$refs['deleteArea'] as UniElement;
+			
+			// https://doc.dcloud.net.cn/uni-app-x/vue/#lifecycle-options
+			// 计算图片起始区域
+			uni.createSelectorQuery().select('.addfile').boundingClientRect().exec((ret) => {
+				const nodeInfo = ret[0] as NodeInfo;
+				this.startY = nodeInfo.top!; 
+			});
+			
+			// 计算删除区域的y轴位置, 
+			if (this.deleteAreaY == 0) {
+				this.deleteAreaY = sys.screenHeight - (100 + this.bottomSafeHeight);
+			}
+		},
+		methods: {
+			onTouchStart(e : TouchEvent, index: number) {
+				const element = e.target as UniElement | null;
+				if (element == null) return;
+				
+				this.currentElement = element;
+				const nodeInfo = element.getBoundingClientRect() as NodeInfo;
+				this.nodePosition = [nodeInfo.left!, nodeInfo?.top!];
+				this.currentIndex = index;
+				if (!this.move) {
+					this.move = true;
+				}
+			},
+			
+			onTouchMove(e : TouchEvent) {
+				e.preventDefault()
+				let p = e.touches[0]
+				if (p.screenX == this.lastX && p.screenY == this.lastY) {
+					return
+				}
+				this.lastX = p.screenX
+				this.lastY = p.screenY
+				this.imageMovingAction(p.screenX, p.screenY);
+			},
+			
+			onTouchEnd(e : TouchEvent) {
+				if (e.touches.length == 0) {
+					this.move = false;
+					this.deleteImage();
+				}
+			},
+			
+			imageMovingAction(x: number, y: number) {
+				// 实时更新当前图片位置 +-50 是图片尺寸的一半
+				this.currentElement?.style?.setProperty('position', 'fixed')
+				this.currentElement?.style?.setProperty('left', x - 50 + 'px')
+				this.currentElement?.style?.setProperty('top', y - 50 + 'px')
+				this.currentElement?.style?.setProperty('z-index', 1 + this.currentIndex)
+				this.currentElement?.style?.setProperty('opacity', 0.8)
+				// 判断当前y轴是否触碰到了删除区域
+				if (this.deleteAreaY > 0) {
+					this.isInDeleteArea = (y + 50) >= this.deleteAreaY;
+				}
+			},
+			
+			// 移动结束重置图片位置
+			imageMovendAction() {
+				// this.currentElement?.style?.setProperty('position', 'relative')
+				this.currentElement?.style?.setProperty('left', this.nodePosition[0] + 'px')
+				this.currentElement?.style?.setProperty('top', this.nodePosition[1] + 'px')
+				this.currentElement?.style?.setProperty('z-index', 1);
+				this.currentElement?.style?.setProperty('opacity', 1); 
+				// this.resetImagesPosition(); // 重置所有图片位置
+			},
+			
+			deleteImage() {
+				if (!this.isInDeleteArea) {
+					this.imageMovendAction();
+					return;
+				}
+				this.isInDeleteArea = false;
+				this.imageList!!.splice(this.currentIndex, 1);
+				this.resetImagesPosition();
+			},
+			
+			// 获取剩余的所有节点信息，并重置图片位置 
+			resetImagesPosition() {
+				const imageWith = 100; // 图片宽度
+				const spacing = 5; // 图片间的间隔
+				const startX = 30; // x轴起始边距
+				const staerY = this.startY; // y轴起始边距
+				for (let i = 0; i < this.imageList!!.length; i++) {
+				    const row = Math.floor(i / 3); // 计算行数
+				    const col = i % 3; // 计算列数
+				    const x = startX + col * (100 + spacing); // 计算 x 轴坐标
+				    const y = staerY + row * (imageWith + spacing); // 计算 y 轴坐标
+					this.setImagePosition(i, x, y);
+				}
+			},
+			
+			// 设置图片位置
+			setImagePosition(index: number, x: number, y: number) {
+				const element = uni.getElementById<UniElement>(`image_${index}`);
+				element?.style?.setProperty('position', 'fixed')
+				element?.style?.setProperty('left', x + 'px'); 
+				element?.style?.setProperty('top', y + 'px');
+			},
+			
+			// 选择图片
+			chooseImage () {
+				this.$emit('chooseImage', {});
+			},
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	.addfile {
+		margin-bottom: 30px;
+		.apply-image {
+			width: 100px;
+			height: 100px;
+			margin: 0 5px 5px 0;
+		}
+		
+		.uni-addfile, .image {
+			background-color: #eee;
+			width: 100px;
+			height: 100px;
+			border-radius: 3px;
+			
+			.plus {
+				width: 50px;
+				height: 50px;
+			}
+		}
+	}
+	
+	// 删除区域
+	.delete-area {
+		background: #fa5151;
+		position: fixed;
+		bottom: -100px;
+		left: 0;
+		right: 0;
+		z-index: 99;
+		transition-property: bottom;
+		transition-duration: 300ms;
+	}
+	
+	.delete-area.show {
+		bottom: 0;
+	}
+	
+	.delete-area.opacity {
+		background: rgba(250, 81, 81, 0.6);
+	}
+</style>
