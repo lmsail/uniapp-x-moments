@@ -1,4 +1,5 @@
 
+// 获取当前定位
 export type LocationType = {
 	altitude: number;
 	latitude: number;

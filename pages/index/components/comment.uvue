@@ -19,7 +19,7 @@
 		
 		<!-- 评论列表 -->
 		<view class="comment-list">
-			<view class="comment-item uni-row uni-items-center uni-row-wrap" :id="listId" hover-class="comment-hover" :hover-stay-time="100" @click="toComment">
+			<view class="comment-item uni-row uni-items-center uni-row-wrap" hover-class="comment-hover" :hover-stay-time="100" @click="toComment">
 				<text class="username font-16">查理斯：</text>
 				<text class="font-16">这是什么地方？真好看啊</text>
 			</view>
@@ -33,40 +33,21 @@
 	</view>
 </template>
 
-<script>
+<script setup>
 	import CommentText from './comment-text.uvue';
-	export default {
-		components: {
-			CommentText
-		},
-		props: {
-			listId: {
-				type: String,
-				default: ""
-			}
-		},
-		data() {
-			return {
-				
-			}
-		},
-		methods: {
-			toComment(e : PointerEvent) {
-				uni.$emit('commentScrollEvent', e!.y);
-			},
-		}
+	
+	const toComment = (e : PointerEvent) => {
+		uni.$emit('commentScrollEvent', e.y);
 	}
 </script>
 
 <style scoped lang="scss">
-// 点赞/评论列表
 .zancomment {
 	background-color: #F7F6F7;
 	border-radius: 5px;
 	
 	.username {
 		color: #596D95;
-		font-weight: 700;
 	}
 	
 	.zanlist {

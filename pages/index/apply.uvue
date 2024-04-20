@@ -11,8 +11,7 @@
 
 		<!-- 发表文字 -->
 		<view class="content">
-			<textarea class="uni-textarea font-16" cursor-color="#29ad68" :auto-focus="false" :auto-height="true"
-				:adjust-position="false" :maxlength="100"></textarea>
+			<textarea class="uni-textarea font-16" cursor-color="#29ad68" :auto-focus="true" :auto-height="true" :adjust-position="false" :maxlength="100"></textarea>
 
 			<!-- 图片上传 -->
 			<uni-drag-image ref="dragImage" :imageList="imageList" @chooseImage="chooseImageEvent"></uni-drag-image>
@@ -32,6 +31,7 @@
 	import UniList from '@/components/uni-list/uni-list.uvue';
 	import UniItem from '@/components/uni-list/uni-item.uvue';
 	import uniDragImage from '../../components/uni-drag-image/uni-drag-image.uvue';
+	// 
 	export default {
 		components: {
 			UniList,
@@ -41,17 +41,7 @@
 		data() {
 			return {
 				disabled: true,
-				imageList: [
-					"http://iph.href.lu/200x200?text=1&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=2&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=3&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=4&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=5&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=6&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=7&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=8&fg=666666&bg=cccccc",
-					"http://iph.href.lu/200x200?text=9&fg=666666&bg=cccccc",
-				] as string[],
+				imageList: [] as string[],
 
 				address: '', // 当前位置信息
 			};
@@ -82,13 +72,24 @@
 
 			// 发表朋友圈
 			apply() {
-
+				this.imageList = [
+					"http://iph.href.lu/200x200?text=1&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=2&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=3&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=4&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=5&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=6&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=7&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=8&fg=666666&bg=cccccc",
+					"http://iph.href.lu/200x200?text=9&fg=666666&bg=cccccc",
+				];
 			},
 
 			// 选择图片
 			chooseImageEvent() {
+				const count = this.imageList.length > 0 ? 9 - this.imageList.length : this.imageList.length;
 				uni.chooseImage({
-					count: 9,
+					count: count,
 					sizeType: ['original', 'compressed'],
 					sourceType: ['album', 'camera'],
 					success: res => {

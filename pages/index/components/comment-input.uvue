@@ -6,7 +6,6 @@
 			placeholder="回复查理斯:"
 			confirm-type="send"
 			:adjust-position="false"
-			@focus="showKeyboard"
 			@blur="hideKeyboard"
 			@keyboardheightchange="onKeyborardHeightChange" 
 		/>
@@ -19,17 +18,9 @@
 			return {
 				keyboardHeight: -100,
 				keyboardStatus: false,
-				keyboardCacheHeight: 0, // 键盘高度缓存，第一次获取后就缓存起来
 			}
 		},
 		mounted() {
-			
-			// 获取上一次缓存的键盘高度
-			let keyboardHeight = uni.getStorageSync('keyboardCacheHeight') as string;
-			if (keyboardHeight != '') {
-				this.keyboardCacheHeight = keyboardHeight.toInt();
-				this.keyboardHeightChange();
-			}
 			// 监听点击评论事件
 			uni.$on('commentScrollEvent', () => {
 				if (this.keyboardStatus) {
@@ -47,18 +38,11 @@
 			},
 			
 			// 键盘相关事件
-			// TODO 这里不太严谨，待优化...
 			onKeyborardHeightChange(event : UniInputKeyboardHeightChangeEvent) {
-				if (!this.keyboardStatus || this.keyboardCacheHeight > 0) {
+				if (!this.keyboardStatus) {
 					return;
 				}
-				if (event.detail.duration == 0) {
-					this.keyboardHeight = -100;
-				} else {
-					this.keyboardHeight = event.detail.height;
-				}
-				this.keyboardCacheHeight = this.keyboardHeight;
-				uni.setStorageSync('keyboardCacheHeight', this.keyboardCacheHeight);
+				this.keyboardHeight = event.detail.height;
 				this.keyboardHeightChange();
 			},
 			
@@ -67,13 +51,6 @@
 				(this.$refs['commentInput'] as UniInputElement).blur();
 				this.keyboardStatus = false;
 				this.keyboardHeight = -100;
-			},
-			
-			// 得到焦点 - 显示键盘
-			showKeyboard() {
-				if (this.keyboardCacheHeight > 0) {
-					this.keyboardHeight = this.keyboardCacheHeight;
-				}
 			}
 		}
 	}
@@ -89,7 +66,7 @@
 		right: 0;
 		z-index: 999;
 		transition-property: bottom;
-		transition-duration: 0.25s;
+		transition-duration: 100ms;
 		box-shadow: 0 -5px 5px -5px rgba(0, 0, 0, 0.3) inset;
 		
 		.uni-input {

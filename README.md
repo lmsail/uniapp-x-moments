@@ -1,10 +1,17 @@
 ## 项目说明
 
-尽可能的还原了微信朋友圈的UI、交互，`uniapp x` 体验比 `uniapp` 要好很多，熟悉`ts`的朋友可以快速上手！
+尽可能的还原了微信朋友圈的UI、交互，仅在ios上真机测试了效果，安卓真机未测试，大家可以下载感受一下！
 
 ## 更新说明
 
-### 1.0.0（2024-04-19）
+### 1.0.2（2024-04-20）
+
+- 修复安卓端运行报错、类型补全等
+- 优化安卓端体验
+- 新增九宫格图片尺寸动态计算
+- 新增发表朋友圈页面图片尺寸动态计算
+
+### 1.0.1（2024-04-19）
 
 - 补全变量类型，修复安装打包、运行报错，🎉 支持安卓
 - 优化代码结构
@@ -28,10 +35,8 @@ video竖屏全屏退出后，视频出现黑屏为官方BUG，官方正在修复
 
 [查看BUG修复进度](https://issues.dcloud.net.cn/pages/issues/detail?id=1491)  
 
-## 预览
-
-<img src="https://img-cdn-tx.dcloud.net.cn/stream/plugin_screens/a7e92550-fc8d-11ee-829d-478a042f758e_0.png" width="200" /> <img src="https://img-cdn-tx.dcloud.net.cn/stream/plugin_screens/a7e92550-fc8d-11ee-829d-478a042f758e_1.png" width="200" /> <img src="https://img-cdn-tx.dcloud.net.cn/stream/plugin_screens/a7e92550-fc8d-11ee-829d-478a042f758e_2.png" width="200" />  
-
 ---
 
-## 微信/QQ：582639426
+## 微信/QQ：582639426！  
+
+## github下载地址：[高度还原微信朋友圈](https://github.com/lmsail/uniapp-x-moments)  

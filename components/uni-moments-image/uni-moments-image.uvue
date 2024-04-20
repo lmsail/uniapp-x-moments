@@ -1,0 +1,45 @@
+<template>
+	<image 
+		class="image" 
+		v-for="(image, index) in imageList" 
+		:src="image" 
+		:style="{ width: imageSize, height: imageSize }"
+		mode="aspectFill" 
+		@click="previewImage(index)"
+	></image>
+</template>
+
+<script setup>
+	const props = defineProps({
+		imageList: Array as PropType<Array<String>>
+	});
+	
+	// TODO 待优化...
+	const system = uni.getSystemInfoSync();
+	
+	// 计算图片尺寸，这里的105是根据布局尺寸得来的
+	// 1、最外层左右 padding：15px -> 30px
+	// 2、每张图片右边距：5px -> 3张图片：15px
+	// 3、头像：45px，右侧边距：15px
+	const imageSize = computed<String>((): String => {
+		const imageCount = props.imageList!.length;
+		return imageCount >= 3 ? `${(system.screenWidth - 105) / 3}px` : `${(system.screenWidth - 105) / 2}px`;
+	});
+	
+	// 图片预览
+	const previewImage = (index: number) => {
+		uni.previewImage({
+			urls: props.imageList!,
+			current: index
+		})
+	}
+</script>
+
+<style lang="scss" scoped>
+	.image {
+		margin: 5px 5px 0 0;
+		// width: 90px;
+		// height: 90px;
+		border-radius: 2px;
+	}
+</style>

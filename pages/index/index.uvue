@@ -4,7 +4,6 @@
 		:refresher-enabled="false" 
 		:refresher-default-style="refresherStyle"
 		:refresher-triggered="refresherTriggered" 
-		@refresherrefresh="refresherrefresh" 
 		@scrolltolower="onScrollTolower"
 		@scroll="scrollEvent"
 		@touchstart="outsideTouchEvent"
@@ -31,7 +30,7 @@
 				<!-- 时间/点赞/评论按钮 -->
 				<comment-line></comment-line>
 				<!-- 点赞/评论信息列表 -->
-				<comment listId="comment-id"></comment> 
+				<comment></comment> 
 			</view>
 		</list-item>
 	
@@ -43,7 +42,7 @@
 				<text class="text">{{ text }}</text>
 				<!-- 图片 / 视频 -->
 				<view class="images uni-row">
-					<image class="image" v-for="(image, index) in imageList" :src="image" mode="aspectFill" @click="previewImage(index)"></image>
+					<uni-moments-image :imageList="imageList"></uni-moments-image>
 				</view>
 				<!-- 定位 -->
 				<text class="address mt-5">上海市 · 静安寺</text>
@@ -59,10 +58,10 @@
 	<moments-header ref="header" :scrollTop="scrollTop"></moments-header>
 	
 	<!-- 点赞/评论 -->
-	<comment-popup ref="commentPopupRef"></comment-popup>
+	<comment-popup ref="commentPopup"></comment-popup>
 	
 	<!-- 评论输入框 -->
-	<comment-input ref="commentInputRef"></comment-input>
+	<comment-input ref="commentInput"></comment-input>
 </template> 
 
 <script>
@@ -71,8 +70,9 @@
 	import CommentLine from './components/comment-line.uvue';
 	import CommentInput from './components/comment-input.uvue';
 	import Comment from './components/comment.uvue';
+	import uniMomentsImage from '../../components/uni-moments-image/uni-moments-image.uvue';
 	export default {
-		components: { CommentLine, Comment, MomentsHeader, CommentInput, CommentPopup },
+		components: { CommentLine, Comment, MomentsHeader, CommentInput, CommentPopup, uniMomentsImage },
 		data() {
 			return {
 				item_count: 20,
@@ -89,7 +89,7 @@
 					"https://img0.baidu.com/it/u=256816879,771155532&fm=253&app=120&size=w931&n=0&f=JPEG&fmt=auto?sec=1713286800&t=d5230b0cfdae75de3c452d973d302106",
 				],
 				scrollTop: 0,
-				keyboardHeight: 368, // ios 默认键盘高度，这里占位
+				keyboardHeight: 200, // ios 默认键盘高度，这里占位
 			}
 		},
 		onReady() {
@@ -106,24 +106,8 @@
 			// 目标元素以外的touch事件
 			outsideTouchEvent() {
 				// https://doc.dcloud.net.cn/uni-app-x/component/#methods
-				(this.$refs['commentPopupRef'] as ComponentPublicInstance).$callMethod('hideCommentPopup'); // 隐藏点赞/评论
-				(this.$refs['commentInputRef'] as ComponentPublicInstance).$callMethod('hideKeyboard'); // 隐藏评论框与键盘
-			},
-			
-			previewImage(index : number) {
-				uni.previewImage({
-					urls: this.imageList,
-					current: index,
-					indicator: "default",
-					loop: false
-				})
-			},
-
-			refresherrefresh() {
-				console.log('下拉刷新被触发了')
-				setTimeout(() => {
-					this.refresherTriggered = false;
-				}, 1000)
+				(this.$refs['commentPopup'] as ComponentPublicInstance).$callMethod('hideCommentPopup'); // 隐藏点赞/评论
+				(this.$refs['commentInput'] as ComponentPublicInstance).$callMethod('hideKeyboard'); // 隐藏评论框与键盘
 			},
 
 			onScrollTolower(_ : ScrollToLowerEvent) {

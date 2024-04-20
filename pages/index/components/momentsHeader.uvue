@@ -17,10 +17,6 @@
 <script>
 	export default {
 		props: {
-			windowInfo: {
-				type: Object,
-				default: {}
-			},
 			scrollTop: {
 				type: Number,
 				default: 0
@@ -51,7 +47,6 @@
 		},
 		methods: {
 			toApply() {
-				console.log('123')
 				uni.navigateTo({ url: '/pages/index/apply' });
 			},
 		}
